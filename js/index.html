@@ -1,0 +1,63 @@
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Coordinates</title>
+</head>
+<body>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+  <h1>Coordinates</h1>
+  <form>
+    x: <input type="number" id="ox" value="0"/><br/>
+    y: <input type="number" id="oy" value="0"/><br/>
+    <input type="button" value="calc" id="calc"/>
+  </form>
+  <script>
+  var carray=[];
+  $(function() {
+    $.getJSON("coordinates.json" , function(data) {
+      var ulObj = $("#demo"),
+          len = data.length;
+      for(var i = 0; i < len; i++) {
+        var v=data[i].value;
+        var xy=v.split(",");
+        data[i].x=xy[0];
+        data[i].y=xy[1];
+        carray.push(data[i]);
+      }
+    });
+  });
+
+  $('#calc').click(function() {
+    var ox=$('#ox').val();
+    var oy=$('#oy').val();
+    var ulObj = $("#demo");
+    ulObj.empty();
+    for(var i=0;i<carray.length;i++) {
+      var coord=carray[i];
+      var dx=ox-coord.x;
+      var dy=oy-coord.y;
+      var dist=Math.sqrt(dx*dx+dy*dy);
+      coord.dist=dist;
+      ulObj.append($("<li>").attr({"id":coord.id}).text(coord.id+", dist="+coord.dist));
+    }
+    carray.sort(compare);
+    ulObj.empty();
+    for(var i=0;i<carray.length;i++) {
+      var coord=carray[i];
+      ulObj.append($("<li>").attr({"id":coord.id}).text(coord.id+", dist="+coord.dist));
+    }
+  });
+
+  function compare(a, b) {
+    if (a.dist<b.dist)
+       return -1;
+    if (a.dist>b.dist)
+       return 1;
+    return 0;
+  }
+
+  </script>
+  <div id="demo"></div>
+</body>
+</html>
